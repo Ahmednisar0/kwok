@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { CartItem } from "@/types";
 import Navbar from "@/app/components/Navbar";
+import client from "../lib/sanity";
 
 export default function CheckoutPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -33,11 +34,7 @@ export default function CheckoutPage() {
     setDeliveryInfo(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    alert("Order placed successfully!");
-  };
+ 
 
   if (isLoading) {
     return (
@@ -46,6 +43,40 @@ export default function CheckoutPage() {
       </div>
     );
   }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+ 
+  // Build order object
+  const orderData = {
+    _type: "order", // (for Sanity schema, if you have one)
+    customer: {
+      name: deliveryInfo.name,
+      phone: deliveryInfo.phone,
+      address: deliveryInfo.address,
+      instructions: deliveryInfo.instructions || "",
+    },
+    items: cartItems.map((item) => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+      total: item.price * item.quantity,
+    })),
+    subtotal,
+    deliveryFee,
+    total: totalPrice,
+    createdAt: new Date().toISOString(),
+  };
+
+  try {
+    const result = await client.create(orderData);
+    console.log("Order saved:", result);
+    alert("Order placed successfully!");
+  } catch (error) {
+    console.error("Error saving order:", error);
+    alert("Something went wrong. Please try again.");
+  }
+};
 
   return (
 
