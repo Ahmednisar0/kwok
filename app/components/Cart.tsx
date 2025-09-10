@@ -37,7 +37,7 @@ export default function Cart({ cartItems, setCartItems, onClose }: CartProps) {
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-end z-50">
       <div className="w-full sm:w-96 bg-white h-full p-6 shadow-xl overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Your Cart</h2>
+          <h2 className="text-2xl text-gray-900 font-bold">Your Cart</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             ✕
           </button>
@@ -53,22 +53,22 @@ export default function Cart({ cartItems, setCartItems, onClose }: CartProps) {
                 className="mb-4 flex justify-between items-center border-b pb-3"
               >
                 <div>
-                  <h3 className="font-semibold">{item.name}</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                  <p className="text-sm text-gray-900">
                     Rs. {item.price} × {item.quantity}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                    className="px-2 py-1 bg-gray-200 rounded"
+                    className="px-2 py-1 bg-gray-200 rounded text-gray-900"
                   >
                     -
                   </button>
                   <span>{item.quantity}</span>
                   <button
                     onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                    className="px-2 py-1 bg-gray-200 rounded"
+                    className="px-2 py-1 bg-gray-200 rounded text-gray-900"
                   >
                     +
                   </button>
@@ -82,7 +82,7 @@ export default function Cart({ cartItems, setCartItems, onClose }: CartProps) {
               </div>
             ))}
 
-            <div className="mt-6 flex justify-between font-bold text-lg">
+            <div className="mt-6 flex justify-between font-bold text-lg text-gray-900">
               <span>Total:</span>
               <span>Rs. {totalPrice.toFixed(2)}</span>
             </div>
