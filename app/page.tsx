@@ -80,7 +80,7 @@ export default function Home() {
         </div>
         
         {/* Food Items Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredItems.map(item => (
             <FoodItem 
               key={item.id} 
@@ -112,7 +112,7 @@ export default function Home() {
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-sm text-gray-600">Total</div>
-                <div className="font-bold text-lg">Rs{getTotalPrice().toFixed(2)}</div>
+                <div className="font-bold text-black text-lg">Rs{getTotalPrice().toFixed(2)}</div>
               </div>
               <button 
                 onClick={() => setShowCart(true)}

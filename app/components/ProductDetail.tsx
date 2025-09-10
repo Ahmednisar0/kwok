@@ -2,7 +2,6 @@
 
 import { FoodItem } from '@/types';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 interface ProductDetailProps {
   product: FoodItem;
@@ -13,7 +12,6 @@ interface ProductDetailProps {
 export default function ProductDetail({ product, onClose, onAddToCart }: ProductDetailProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const router = useRouter();
 
   const nextImage = () => {
     setCurrentImageIndex(prev =>
@@ -28,13 +26,11 @@ export default function ProductDetail({ product, onClose, onAddToCart }: Product
   };
 
   const handleAddToCart = () => {
-    // ✅ Add the product multiple times based on quantity
     for (let i = 0; i < quantity; i++) {
       onAddToCart(product);
     }
-
-    // ✅ Redirect to cart page directly
-    router.push("/cart");
+    // ✅ Sirf modal close hoga
+    onClose();
   };
 
   const increaseQuantity = () => setQuantity(prev => prev + 1);
@@ -59,7 +55,6 @@ export default function ProductDetail({ product, onClose, onAddToCart }: Product
             style={{ backgroundImage: `url(${product.images[currentImageIndex]})` }}
           ></div>
 
-          {/* Prev & Next buttons */}
           {product.images.length > 1 && (
             <>
               <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-amber-500 p-2 rounded-full">
@@ -82,13 +77,13 @@ export default function ProductDetail({ product, onClose, onAddToCart }: Product
           <p className="text-gray-700 mb-6 leading-relaxed">{product.description}</p>
 
           {/* Quantity Selector */}
-          <div className="mb-6 flex items-center gap-3">
+          <div className="mb-6 flex items-center gap-3 text-black">
             <button onClick={decreaseQuantity} className="w-10 h-10 bg-amber-200 rounded-full">-</button>
-            <span className="text-xl font-bold">{quantity}</span>
+            <span className="text-xl font-bold text-black">{quantity}</span>
             <button onClick={increaseQuantity} className="w-10 h-10 bg-amber-200 rounded-full">+</button>
           </div>
 
-          {/* ✅ Add to Cart (Direct redirect to /cart) */}
+          {/* ✅ Only Add to Cart button */}
           <button 
             className="w-full bg-amber-500 text-amber-900 font-bold py-4 px-6 rounded-xl hover:bg-amber-600 transition-all"
             onClick={handleAddToCart}

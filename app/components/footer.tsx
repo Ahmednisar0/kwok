@@ -20,9 +20,9 @@ export default function Footer() {
 
         {/* Contact info */}
         <div className="text-center text-sm text-amber-200">
-          <p>📍 Lahore, Pakistan</p>
-          <p>📞 +92 300 1234567</p>
-          <p>✉️ support@kkwokfries.com</p>
+          <p>Location: Shop 3 farooq market opposite street 4 G 13 /3</p>
+          <p> ++923463323775</p>
+          <p> support@kkwokfries.com</p>
         </div>
 
         {/* Bottom line */}
