@@ -13,6 +13,7 @@ export default function CheckoutPage() {
     phone: "",
     address: "",
     instructions: "",
+    deliveryMethod: "delivery", // 'delivery' or 'pickup'
   });
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,14 +27,14 @@ export default function CheckoutPage() {
     setIsLoading(false);
   }, []);
 
-  const deliveryFee = 150;
+  const deliveryFee = deliveryInfo.deliveryMethod === "delivery" ? 150 : 0;
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
   const totalPrice = subtotal + deliveryFee;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setDeliveryInfo(prev => ({ ...prev, [name]: value }));
   };
@@ -42,15 +43,23 @@ export default function CheckoutPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Validate delivery address if delivery method is selected
+    if (deliveryInfo.deliveryMethod === "delivery" && !deliveryInfo.address) {
+      alert("Please provide a delivery address for delivery orders.");
+      setIsSubmitting(false);
+      return;
+    }
+    
     // Build order object
     const orderData = {
       _type: "order",
       customer: {
         name: deliveryInfo.name,
         phone: deliveryInfo.phone,
-        address: deliveryInfo.address,
+        address: deliveryInfo.deliveryMethod === "delivery" ? deliveryInfo.address : "Pickup",
         instructions: deliveryInfo.instructions || "",
       },
+      deliveryMethod: deliveryInfo.deliveryMethod,
       items: cartItems.map((item) => ({
         id: item.id,
         name: item.name,
@@ -158,11 +167,32 @@ export default function CheckoutPage() {
             {/* Delivery Form */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
               <div className="p-6 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-800">Delivery Information</h2>
-                <p className="mt-1 text-sm text-gray-500">Where should we deliver your food?</p>
+                <h2 className="text-xl font-semibold text-gray-800">Order Information</h2>
+                <p className="mt-1 text-sm text-gray-500">How would you like to receive your order?</p>
               </div>
               
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <div>
+                  <label htmlFor="deliveryMethod" className="block text-sm font-medium text-gray-700 mb-1">
+                    Delivery Method
+                  </label>
+                  <select
+                    id="deliveryMethod"
+                    name="deliveryMethod"
+                    value={deliveryInfo.deliveryMethod}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    <option value="delivery">Home Delivery (Islamabad Only)</option>
+                    <option value="pickup">Pickup from Store</option>
+                  </select>
+                  {deliveryInfo.deliveryMethod === "delivery" && (
+                    <p className="mt-1 text-xs text-blue-600">
+                      Note: We only deliver within Islamabad city limits.
+                    </p>
+                  )}
+                </div>
+                
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                     Full Name
@@ -195,25 +225,30 @@ export default function CheckoutPage() {
                   />
                 </div>
                 
-                <div>
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                    Delivery Address
-                  </label>
-                  <input
-                    type="text"
-                    id="address"
-                    name="address"
-                    value={deliveryInfo.address}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                    placeholder="Enter your delivery address"
-                  />
-                </div>
+                {deliveryInfo.deliveryMethod === "delivery" && (
+                  <div>
+                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                      Delivery Address (Islamabad Only)
+                    </label>
+                    <input
+                      type="text"
+                      id="address"
+                      name="address"
+                      value={deliveryInfo.address}
+                      onChange={handleInputChange}
+                      required={deliveryInfo.deliveryMethod === "delivery"}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      placeholder="Enter your delivery address in Islamabad"
+                    />
+                    <p className="mt-1 text-xs text-blue-600">
+                      Please provide your complete address in Islamabad for delivery.
+                    </p>
+                  </div>
+                )}
                 
                 <div>
                   <label htmlFor="instructions" className="block text-sm font-medium text-gray-700 mb-1">
-                    Delivery Instructions (Optional)
+                    Special Instructions (Optional)
                   </label>
                   <textarea
                     id="instructions"
@@ -222,7 +257,11 @@ export default function CheckoutPage() {
                     onChange={handleInputChange}
                     rows={3}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                    placeholder="e.g., Call when arriving, leave at door, etc."
+                    placeholder={
+                      deliveryInfo.deliveryMethod === "delivery" 
+                        ? "e.g., Call when arriving, leave at door, etc." 
+                        : "e.g., Preferred pickup time, special requests, etc."
+                    }
                   />
                 </div>
               </form>
@@ -267,10 +306,12 @@ export default function CheckoutPage() {
                     <span>Rs. {subtotal.toFixed(2)}</span>
                   </div>
                   
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>Delivery Fee</span>
-                    <span>Rs. {deliveryFee.toFixed(2)}</span>
-                  </div>
+                  {deliveryInfo.deliveryMethod === "delivery" && (
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Delivery Fee (Islamabad Only)</span>
+                      <span>Rs. {deliveryFee.toFixed(2)}</span>
+                    </div>
+                  )}
                   
                   <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200">
                     <span>Total</span>
@@ -293,7 +334,7 @@ export default function CheckoutPage() {
                         Processing...
                       </>
                     ) : (
-                      "Place Order"
+                      deliveryInfo.deliveryMethod === "delivery" ? "Place Delivery Order" : "Place Pickup Order"
                     )}
                   </button>
                 </div>
